@@ -17,6 +17,8 @@ class StockInSuccess extends StockInState {
   final int page;
   final bool hasMore;
   final bool isLoadingMore;
+  final bool isRefreshing;
+  final StockInFilter filter;
 
   const StockInSuccess({
     required this.receipts,
@@ -24,6 +26,8 @@ class StockInSuccess extends StockInState {
     required this.page,
     required this.hasMore,
     this.isLoadingMore = false,
+    this.isRefreshing = false,
+    this.filter = const StockInFilter(),
   });
 
   StockInSuccess copyWith({
@@ -32,6 +36,8 @@ class StockInSuccess extends StockInState {
     int? page,
     bool? hasMore,
     bool? isLoadingMore,
+    bool? isRefreshing,
+    StockInFilter? filter,
   }) {
     return StockInSuccess(
       receipts: receipts ?? this.receipts,
@@ -39,11 +45,21 @@ class StockInSuccess extends StockInState {
       page: page ?? this.page,
       hasMore: hasMore ?? this.hasMore,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      isRefreshing: isRefreshing ?? this.isRefreshing,
+      filter: filter ?? this.filter,
     );
   }
 
   @override
-  List<Object?> get props => [receipts, total, page, hasMore, isLoadingMore];
+  List<Object?> get props => [
+    receipts,
+    total,
+    page,
+    hasMore,
+    isLoadingMore,
+    isRefreshing,
+    filter,
+  ];
 }
 
 class StockInFailure extends StockInState {

@@ -52,7 +52,9 @@ class PrimaryTextField extends StatelessWidget {
           style: AppStyles.s14W400,
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: AppStyles.s14W400.copyWith(color: AppColors.textSecondary),
+            hintStyle: AppStyles.s14W400.copyWith(
+              color: AppColors.textSecondary,
+            ),
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
           ),

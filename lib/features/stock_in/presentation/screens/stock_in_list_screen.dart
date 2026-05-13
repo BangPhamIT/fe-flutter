@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_app/core/theme/themes.dart';
 import 'package:inventory_app/features/stock_in/presentation/cubit/stock_in_cubit.dart';
 import 'package:intl/intl.dart';
+import 'package:inventory_app/data/models/stock_in_filter.dart';
+import 'package:inventory_app/features/stock_in/presentation/widgets/stock_in_filter_dialog.dart';
+import 'package:inventory_app/core/widgets/primary_textfield.dart';
 import 'stock_in_form_screen.dart';
 
 class StockInListScreen extends StatefulWidget {
@@ -14,17 +18,40 @@ class StockInListScreen extends StatefulWidget {
 
 class _StockInListScreenState extends State<StockInListScreen> {
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     context.read<StockInCubit>().fetchList();
     _scrollController.addListener(_onScroll);
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      final currentState = context.read<StockInCubit>().state;
+      if (currentState is StockInSuccess) {
+        context.read<StockInCubit>().fetchList(
+              filter: currentState.filter.copyWith(
+                receiptNumber: _searchController.text,
+              ),
+            );
+      } else {
+        context.read<StockInCubit>().fetchList(
+              filter: StockInFilter(receiptNumber: _searchController.text),
+            );
+      }
+    });
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -81,14 +108,22 @@ class _StockInListScreenState extends State<StockInListScreen> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildSearchBar(state),
+              if (state is StockInSuccess && state.isRefreshing)
+                const LinearProgressIndicator(minHeight: 2),
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 child: Text('Danh sách phiếu', style: AppStyles.s18W700),
               ),
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async {
-                    await context.read<StockInCubit>().fetchList();
+                    final cubit = context.read<StockInCubit>();
+                    if (state is StockInSuccess) {
+                      await cubit.fetchList(filter: (state as StockInSuccess).filter);
+                    } else {
+                      await cubit.fetchList();
+                    }
                   },
                   child: CustomScrollView(
                     controller: _scrollController,
@@ -227,6 +262,63 @@ class _StockInListScreenState extends State<StockInListScreen> {
         },
       ),
     );
+  }
+
+  Widget _buildSearchBar(StockInState state) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Row(
+        children: [
+          Expanded(
+            child: PrimaryTextField(
+              controller: _searchController,
+              hintText: 'Tìm kiếm theo số phiếu...',
+              prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            height: 48,
+            width: 48,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: IconButton(
+              onPressed: () => _showFilterDialog(state),
+              icon: Icon(
+                Icons.filter_list,
+                color: (state is StockInSuccess &&
+                        ((state as StockInSuccess).filter.warehouseId != null ||
+                            (state as StockInSuccess).filter.startDate != null ||
+                            (state as StockInSuccess).filter.endDate != null))
+                    ? AppColors.primary
+                    : AppColors.textSecondary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showFilterDialog(StockInState state) async {
+    if (state is! StockInSuccess) return;
+
+    final filter = await showDialog<StockInFilter>(
+      context: context,
+      builder: (context) => StockInFilterDialog(
+        initialFilter: (state as StockInSuccess).filter,
+      ),
+    );
+
+    if (filter != null) {
+      if (mounted) {
+        _searchController.text = filter.receiptNumber ?? '';
+        context.read<StockInCubit>().fetchList(filter: filter);
+      }
+    }
   }
 
   void _navigateToForm(BuildContext context, {String? receiptId}) {

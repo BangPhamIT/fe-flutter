@@ -4,7 +4,11 @@ import 'package:inventory_app/data/models/employee.dart';
 import '../datasource/stock_in_client.dart';
 
 abstract class StockInRepository {
-  Future<Map<String, dynamic>> getStockInList({int page = 1, int limit = 10});
+  Future<Map<String, dynamic>> getStockInList({
+    int page = 1,
+    int limit = 10,
+    Map<String, dynamic>? filter,
+  });
   Future<StockInReceipt> getStockInDetail(String id);
   Future<void> createStockIn(Map<String, dynamic> data);
   Future<void> updateStockIn(String id, Map<String, dynamic> data);
@@ -19,8 +23,12 @@ class StockInRepositoryImpl implements StockInRepository {
   StockInRepositoryImpl(this._client);
 
   @override
-  Future<Map<String, dynamic>> getStockInList({int page = 1, int limit = 10}) {
-    return _client.fetchList(page: page, limit: limit);
+  Future<Map<String, dynamic>> getStockInList({
+    int page = 1,
+    int limit = 10,
+    Map<String, dynamic>? filter,
+  }) {
+    return _client.fetchList(page: page, limit: limit, filter: filter);
   }
 
   @override

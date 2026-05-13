@@ -14,8 +14,14 @@ class StockInClient extends DioClientProvider {
     dio.interceptors.add(InterceptorBuilder.logger);
   }
 
-  Future<Map<String, dynamic>> fetchList({int page = 1, int limit = 10}) async {
-    final response = await requestData(StockInTarget.getList(page: page, limit: limit));
+  Future<Map<String, dynamic>> fetchList({
+    int page = 1,
+    int limit = 10,
+    Map<String, dynamic>? filter,
+  }) async {
+    final response = await requestData(
+      StockInTarget.getList(page: page, limit: limit, filter: filter),
+    );
     return response as Map<String, dynamic>;
   }
 

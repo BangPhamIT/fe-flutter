@@ -3,10 +3,18 @@ import 'package:inventory_app/core/network/dio_options_builder.dart';
 import 'package:inventory_app/core/network/dio_target_type.dart';
 
 class StockInTarget {
-  static DioTargetType getList({int page = 1, int limit = 10}) {
+  static DioTargetType getList({
+    int page = 1,
+    int limit = 10,
+    Map<String, dynamic>? filter,
+  }) {
     return DioTargetType(
       path: ApiConstants.stockInReceipt,
-      queryParameters: {'page': page, 'limit': limit},
+      queryParameters: {
+        'page': page,
+        'limit': limit,
+        if (filter != null) ...filter,
+      },
       options: DioOptionsBuilder.request(method: 'GET'),
     );
   }
