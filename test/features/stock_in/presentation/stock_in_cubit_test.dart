@@ -27,7 +27,11 @@ void main() {
     blocTest<StockInCubit, StockInState>(
       'nên phát ra [StockInLoading, StockInSuccess] khi fetchList thành công',
       build: () {
-        when(() => mockRepository.getStockInList(page: 1, limit: 10)).thenAnswer(
+        when(() => mockRepository.getStockInList(
+          page: 1,
+          limit: 10,
+          filter: any(named: 'filter'),
+        )).thenAnswer(
           (_) async => {
             'elements': [
               {'id': '1', 'receiptNumber': 'PNK-001'}
@@ -47,8 +51,11 @@ void main() {
     blocTest<StockInCubit, StockInState>(
       'nên phát ra [StockInLoading, StockInFailure] khi fetchList bị lỗi',
       build: () {
-        when(() => mockRepository.getStockInList(page: 1, limit: 10))
-            .thenThrow(Exception('API Error'));
+        when(() => mockRepository.getStockInList(
+          page: 1,
+          limit: 10,
+          filter: any(named: 'filter'),
+        )).thenThrow(Exception('API Error'));
         return cubit;
       },
       act: (cubit) => cubit.fetchList(),
@@ -61,7 +68,11 @@ void main() {
     blocTest<StockInCubit, StockInState>(
       'nên phát ra trạng thái isLoadingMore khi fetchMoreList',
       build: () {
-        when(() => mockRepository.getStockInList(page: 2, limit: 10)).thenAnswer(
+        when(() => mockRepository.getStockInList(
+          page: 2,
+          limit: 10,
+          filter: any(named: 'filter'),
+        )).thenAnswer(
           (_) async => {
             'elements': [
               {'id': '2', 'receiptNumber': 'PNK-002'}
