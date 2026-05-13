@@ -22,7 +22,7 @@ class NumberToWords {
 
   static String convert(double amount) {
     int num = amount.floor();
-    if (num == 0) return 'Không đồng';
+    if (num <= 0) return 'Không đồng';
 
     String words = '';
     int unitIndex = 0;
@@ -32,9 +32,11 @@ class NumberToWords {
       if (threeDigits > 0) {
         String part = _readThreeDigits(
           threeDigits,
-          unitIndex > 0 && num >= 1000,
+          num >= 1000,
         );
         words = '$part ${_units[unitIndex]} $words';
+      } else if (num >= 1000 && words.isNotEmpty && !words.startsWith('không trăm')) {
+        words = 'không trăm ${_units[unitIndex]} $words';
       }
       num = num ~/ 1000;
       unitIndex++;
@@ -63,7 +65,7 @@ class NumberToWords {
       } else {
         res += '${_digits[ten]} mươi ';
       }
-    } else if (hundred > 0 && unit > 0) {
+    } else if ((hundred > 0 || showZero) && unit > 0) {
       res += 'lẻ ';
     }
 

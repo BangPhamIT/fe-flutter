@@ -55,7 +55,6 @@ class PrimaryTextField extends StatelessWidget {
             hintStyle: AppStyles.s14W400.copyWith(color: AppColors.textSecondary),
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
-            // Uses global InputDecorationTheme for borders and errorStyle
           ),
         ),
       ],

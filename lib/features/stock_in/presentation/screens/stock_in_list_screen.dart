@@ -94,7 +94,6 @@ class _StockInListScreenState extends State<StockInListScreen> {
                     controller: _scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
-                      // List section
                       if (state is StockInLoading)
                         const SliverFillRemaining(
                           child: Center(child: CircularProgressIndicator()),

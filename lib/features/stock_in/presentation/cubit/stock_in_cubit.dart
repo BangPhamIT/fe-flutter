@@ -67,7 +67,6 @@ class StockInCubit extends Cubit<StockInState> {
         ),
       );
     } catch (e) {
-      // On failure, we just stop loading more but keep existing data
       if (state is StockInSuccess) {
         emit((state as StockInSuccess).copyWith(isLoadingMore: false));
       } else {

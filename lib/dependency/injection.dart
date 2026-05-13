@@ -8,9 +8,11 @@ final getIt = GetIt.instance;
 Future<void> setupInjection() async {
   const String baseUrl = '${ApiConstants.baseUrl}${ApiConstants.prefixApi}';
 
-  // Datasources
-  getIt.registerLazySingleton<StockInClient>(() => StockInClient(baseUrl: baseUrl));
+  getIt.registerLazySingleton<StockInClient>(
+    () => StockInClient(baseUrl: baseUrl),
+  );
 
-  // Repositories
-  getIt.registerLazySingleton<StockInRepository>(() => StockInRepositoryImpl(getIt<StockInClient>()));
+  getIt.registerLazySingleton<StockInRepository>(
+    () => StockInRepositoryImpl(getIt<StockInClient>()),
+  );
 }

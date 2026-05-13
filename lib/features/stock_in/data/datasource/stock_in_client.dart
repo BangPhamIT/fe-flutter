@@ -38,7 +38,6 @@ class StockInClient extends DioClientProvider {
 
   Future<List<Warehouse>> fetchWarehouses() async {
     final data = await requestData(StockInTarget.getWarehouses());
-    // Nếu data là object chứa elements hoặc là list trực tiếp
     final list = (data is Map ? data['elements'] : data) as List? ?? [];
     return list.map((e) => Warehouse.fromJson(e as Map<String, dynamic>)).toList();
   }

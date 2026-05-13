@@ -452,7 +452,13 @@ class _StockInFormScreenState extends State<StockInFormScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Danh sách mặt hàng', style: AppStyles.s16W700),
+        Expanded(
+          child: Text(
+            'Danh sách mặt hàng',
+            style: AppStyles.s16W700,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
         TextButton.icon(
           onPressed: () => _openItemDialog(),
           icon: const Icon(Icons.add_circle_outline),
@@ -503,7 +509,7 @@ class _StockInFormScreenState extends State<StockInFormScreen> {
       constraints: BoxConstraints(
         maxHeight:
             MediaQuery.of(context).size.height *
-            0.4, // Giới hạn chiều cao khoảng 40% màn hình
+            0.4,
       ),
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.border.withAlpha(50)),
