@@ -33,6 +33,12 @@ class _StockInFormScreenState extends State<StockInFormScreen> {
   final _noteController = TextEditingController();
   final _itemScrollController = ScrollController();
 
+  // Reference Controllers
+  final _referenceTypeController = TextEditingController();
+  final _referenceNumberController = TextEditingController();
+  final _referenceDateController = TextEditingController();
+  final _referenceIssuerController = TextEditingController();
+
   @override
   void dispose() {
     _receiptNumberController.dispose();
@@ -45,10 +51,15 @@ class _StockInFormScreenState extends State<StockInFormScreen> {
     _warehouseLocationController.dispose();
     _noteController.dispose();
     _itemScrollController.dispose();
+    _referenceTypeController.dispose();
+    _referenceNumberController.dispose();
+    _referenceDateController.dispose();
+    _referenceIssuerController.dispose();
     super.dispose();
   }
 
   DateTime _selectedDate = DateTime.now();
+  DateTime? _selectedReferenceDate;
   String? _selectedWarehouseId;
   String? _selectedReceiverId;
   String? _selectedCreatorId;
@@ -83,6 +94,16 @@ class _StockInFormScreenState extends State<StockInFormScreen> {
       _debtAccountController.text = r.debtAccount ?? '';
       _creditAccountController.text = r.creditAccount ?? '';
       _noteController.text = r.note ?? '';
+
+      _referenceTypeController.text = r.referenceType ?? '';
+      _referenceNumberController.text = r.referenceNumber ?? '';
+      _selectedReferenceDate = r.referenceDate;
+      if (_selectedReferenceDate != null) {
+        _referenceDateController.text = DateFormat(
+          'dd/MM/yyyy',
+        ).format(_selectedReferenceDate!);
+      }
+      _referenceIssuerController.text = r.referenceIssuer ?? '';
 
       _selectedWarehouseId = r.warehouseId;
       if (_selectedWarehouseId != null) {
@@ -154,6 +175,9 @@ class _StockInFormScreenState extends State<StockInFormScreen> {
                                 children: [
                                   _buildSectionTitle('Thông tin chung'),
                                   _buildGeneralInfo(state),
+                                  const SizedBox(height: 24),
+                                  _buildSectionTitle('Chứng từ kèm theo'),
+                                  _buildReferenceInfo(state),
                                   const SizedBox(height: 24),
                                   _buildSectionTitle('Thông tin kho & Kế toán'),
                                   _buildAccountInfo(state),
@@ -262,6 +286,55 @@ class _StockInFormScreenState extends State<StockInFormScreen> {
                 label: 'Người giao hàng *',
                 hintText: '',
                 validator: (v) => v!.isEmpty ? '' : null,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReferenceInfo(StockInFormState state) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: PrimaryTextField(
+                controller: _referenceTypeController,
+                label: 'Theo',
+                hintText: '',
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: PrimaryTextField(
+                controller: _referenceNumberController,
+                label: 'Số',
+                hintText: '',
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: PrimaryTextField(
+                controller: _referenceDateController,
+                label: 'Ngày',
+                hintText: '',
+                readOnly: true,
+                onTap: _selectReferenceDate,
+                suffixIcon: const Icon(Icons.calendar_today, size: 20),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: PrimaryTextField(
+                controller: _referenceIssuerController,
+                label: 'Của',
+                hintText: '',
               ),
             ),
           ],
@@ -507,9 +580,7 @@ class _StockInFormScreenState extends State<StockInFormScreen> {
     }
     return Container(
       constraints: BoxConstraints(
-        maxHeight:
-            MediaQuery.of(context).size.height *
-            0.4,
+        maxHeight: MediaQuery.of(context).size.height * 0.4,
       ),
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.border.withAlpha(50)),
@@ -688,6 +759,21 @@ class _StockInFormScreenState extends State<StockInFormScreen> {
       setState(() {
         _selectedDate = picked;
         _receiptDateController.text = DateFormat('dd/MM/yyyy').format(picked);
+      });
+    }
+  }
+
+  Future<void> _selectReferenceDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedReferenceDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedReferenceDate = picked;
+        _referenceDateController.text = DateFormat('dd/MM/yyyy').format(picked);
       });
     }
   }
@@ -889,6 +975,10 @@ class _StockInFormScreenState extends State<StockInFormScreen> {
       'warehouseKeeperId': _selectedKeeperId,
       'chiefAccountantId': _selectedAccountantId,
       'note': _noteController.text,
+      'referenceType': _referenceTypeController.text,
+      'referenceNumber': _referenceNumberController.text,
+      'referenceDate': _selectedReferenceDate?.toIso8601String(),
+      'referenceIssuer': _referenceIssuerController.text,
       'totalAmount': _totalAmount,
       'totalAmountInWords': NumberToWords.convert(_totalAmount),
       'items': _items

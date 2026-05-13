@@ -23,6 +23,10 @@ class StockInReceipt extends Equatable {
   final Employee? creator;
   final Employee? warehouseKeeper;
   final Employee? chiefAccountant;
+  final String? referenceType;
+  final String? referenceNumber;
+  final DateTime? referenceDate;
+  final String? referenceIssuer;
   final double totalAmount;
   final List<StockInItem>? items;
 
@@ -46,6 +50,10 @@ class StockInReceipt extends Equatable {
     this.creator,
     this.warehouseKeeper,
     this.chiefAccountant,
+    this.referenceType,
+    this.referenceNumber,
+    this.referenceDate,
+    this.referenceIssuer,
     required this.totalAmount,
     this.items,
   });
@@ -82,6 +90,12 @@ class StockInReceipt extends Equatable {
         chiefAccountant: json['chiefAccountant'] != null
             ? Employee.fromJson(json['chiefAccountant'] as Map<String, dynamic>)
             : null,
+        referenceType: json['referenceType'] as String?,
+        referenceNumber: json['referenceNumber'] as String?,
+        referenceDate: json['referenceDate'] != null
+            ? DateTime.parse(json['referenceDate'] as String)
+            : null,
+        referenceIssuer: json['referenceIssuer'] as String?,
         totalAmount:
             double.tryParse(json['totalAmount']?.toString() ?? '0') ?? 0.0,
         items: (json['items'] as List<dynamic>?)
@@ -104,6 +118,10 @@ class StockInReceipt extends Equatable {
         'chiefAccountantId': chiefAccountantId,
         'warehouseId': warehouseId,
         'note': note,
+        'referenceType': referenceType,
+        'referenceNumber': referenceNumber,
+        'referenceDate': referenceDate?.toIso8601String(),
+        'referenceIssuer': referenceIssuer,
         'totalAmount': totalAmount,
         'items': items?.map((e) => e.toJson()).toList(),
       };
@@ -129,6 +147,10 @@ class StockInReceipt extends Equatable {
         creator,
         warehouseKeeper,
         chiefAccountant,
+        referenceType,
+        referenceNumber,
+        referenceDate,
+        referenceIssuer,
         totalAmount,
         items,
       ];
